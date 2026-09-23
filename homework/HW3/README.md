@@ -69,6 +69,4 @@ SAT - the formula is satisfiable.
 
 ## References
 
-- Course: Introduction to Algorithms (課程：演算法), 陳鍾誠 — see README at `..` (repo root).
 - Wikipedia: [Boolean satisfiability problem](https://en.wikipedia.org/wiki/Boolean_satisfiability_problem)
-  (saved HTML copy in this directory for offline reading).
