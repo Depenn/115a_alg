@@ -1,0 +1,10 @@
+# 03 -- Predicates and comparison
+# With SUB in hand, the orderings are cheap:  m <= n  iff  m - n = 0.
+# Try:  python lambda_calculus.py examples/03_predicate.lc
+
+run IS_ZERO ZERO
+run IS_ZERO THREE
+run IS_LESS_EQUAL TWO THREE
+run IS_LESS_EQUAL THREE TWO
+run IS_EQUAL THREE THREE
+run IS_EQUAL TWO THREE

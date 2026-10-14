@@ -1,0 +1,52 @@
+# ---------------------------------------------------------------------
+# prelude.lc -- Church encodings shared by the examples
+#
+# The interpreter loads this file automatically (disable with --no-prelude).
+# A name is a shorthand for a lambda term: whenever the interpreter focuses
+# on a name it may replace it with its definition.  That is the step marked
+# '[δ unfold NAME]' in the trace.
+# ---------------------------------------------------------------------
+
+# --- Booleans -------------------------------------------------------
+TRUE  = \x. \y. x
+FALSE = \x. \y. y
+IF    = \c. \x. \y. c x y
+AND   = \p. \q. p q p
+OR    = \p. \q. p p q
+NOT   = \c. c FALSE TRUE
+XOR   = \p. \q. p (NOT q) q
+
+# --- Pairs and lists ------------------------------------------------
+PAIR   = \a. \b. \f. f a b
+FST    = \p. p TRUE
+SND    = \p. p FALSE
+NIL    = \f. TRUE
+IS_NIL = \p. p (\x. \y. FALSE)
+
+# --- Fixpoint (used by 'let rec') -----------------------------------
+Y = \f. (\x. f (x x)) (\x. f (x x))
+
+# --- Church numerals ------------------------------------------------
+ZERO = \f. \x. x
+SUCC = \n. \f. \x. f (n f x)
+
+# --- Arithmetic -----------------------------------------------------
+ADD   = \m. \n. n SUCC m
+MULT  = \m. \n. \f. m (n f)
+POWER = \x. \y. y x
+PRED  = \n. \f. \x. n (\g. \h. h (g f)) (\u. x) (\u. u)
+SUB   = \m. \n. n PRED m
+
+# --- Comparison -----------------------------------------------------
+IS_ZERO       = \n. n (\x. FALSE) TRUE
+IS_LESS_EQUAL = \m. \n. IS_ZERO (SUB m n)
+IS_EQUAL      = \m. \n. AND (IS_LESS_EQUAL m n) (IS_LESS_EQUAL n m)
+
+# --- Some numerals to play with -------------------------------------
+ONE     = SUCC ZERO
+TWO     = SUCC ONE
+THREE   = SUCC TWO
+FOUR    = SUCC THREE
+FIVE    = SUCC FOUR
+SIX     = SUCC FIVE
+TEN     = MULT TWO FIVE

@@ -1,0 +1,17 @@
+# 06 -- Lists built out of pairs, plus range and map
+# A list is a pair (head, tail); the empty list is NIL.  Everything is a
+# function, so CAR/CDR are just the pair applied to TRUE / FALSE.
+# Try:  python lambda_calculus.py examples/06_lists.lc
+
+# RANGE m n  =  [m, m+1, ..., n]   (assumes m <= n)
+RANGE = \m. \n. Y (\f. \k. IF (IS_EQUAL k n) (PAIR k NIL) (PAIR k (f (SUCC k)))) m
+
+# MAP g xs applies g to every element of xs
+MAP = \g. \xs. Y (\f. \x. IF (IS_NIL x) NIL (PAIR (g (FST x)) (f (SND x)))) xs
+
+SQUARE = \z. MULT z z
+
+run FST (RANGE TWO FOUR)
+run SND (RANGE TWO FOUR)
+run RANGE TWO FOUR
+run MAP SQUARE (RANGE TWO THREE)

@@ -1,0 +1,20 @@
+# 07 -- The "named" layer:  let, let rec, and why a name is only sugar
+#
+# 'let' is ordinary substitution and 'let rec' is a name for the Y
+# combinator.  Running this file (and watching the trace) is the clearest
+# way to see that names add no power -- they are just a convenient notation
+# on top of the pure lambda calculus.
+# Try:  python lambda_calculus.py examples/07_letrec.lc
+#       python lambda_calculus.py examples/07_letrec.lc --expand   # pure beta
+
+# Plain let: pure substitution.
+run let twice = \f. \x. f (f x) in twice (\y. SUCC y)
+
+# let with several parameters:
+run let add3 = \a. \b. \c. ADD a (ADD b c) in add3 ONE TWO THREE
+
+# let rec: the name may appear in its own body.  It desugars to Y.
+run let rec fact = \n. IF (IS_ZERO n) ONE (MULT n (fact (PRED n))) in fact THREE
+
+# ... and with parameter sugar, exactly like a normal function definition:
+run let rec fact n = IF (IS_ZERO n) ONE (MULT n (fact (PRED n))) in fact THREE

@@ -1,0 +1,9 @@
+# 05 -- Fibonacci with the Y combinator
+# The recursion is exponential: FIB k calls FIB (k-1) and FIB (k-2).
+# Try:  python lambda_calculus.py examples/05_fibonacci.lc
+
+FIB = Y (\f. \n. IF (IS_LESS_EQUAL n ONE) n (ADD (f (PRED n)) (f (PRED (PRED n)))))
+
+run FIB THREE
+run FIB FOUR
+run FIB FIVE      # FIB FIVE = 5; FIB SIX (= 8) needs about 4400 steps

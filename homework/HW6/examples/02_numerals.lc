@@ -1,0 +1,16 @@
+# 02 -- Church numerals and arithmetic
+# A numeral n is the function that applies its first argument n times:
+#   0 = λf.λx.x      1 = λf.λx.f x      2 = λf.λx.f (f x) ...
+# Try:  python lambda_calculus.py examples/02_numerals.lc
+
+run ZERO
+run SUCC TWO
+run ADD TWO THREE
+run MULT TWO THREE
+run POWER TWO THREE
+
+# Subtraction is the tricky one: PRED rebuilds n-1 from scratch using a pair
+# that carries (current, previous) -- Kleene's trick.
+run PRED THREE
+run SUB FIVE TWO
+run SUB TWO FIVE

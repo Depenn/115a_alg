@@ -1,0 +1,12 @@
+# 04 -- The Y combinator, or how an anonymous function calls itself
+# Y f = f (Y f), so Y F is a fixed point of F: recursion without a name.
+# Try:  python lambda_calculus.py examples/04_ycombinator.lc
+
+# A "generator": it is given the recursive call as its parameter f.
+FACT = Y (\f. \n. IF (IS_ZERO n) ONE (MULT n (f (PRED n))))
+
+run FACT TWO
+run FACT THREE
+
+# The same thing written with the named 'let rec' sugar (desugars to Y).
+run let rec fact = \n. IF (IS_ZERO n) ONE (MULT n (fact (PRED n))) in fact THREE

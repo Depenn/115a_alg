@@ -1,0 +1,15 @@
+# 01 -- Church booleans and the logic gates
+# A boolean is a *selector*: TRUE picks its first argument, FALSE its second.
+# Try:  python lambda_calculus.py examples/01_boolean.lc
+
+run TRUE
+run NOT TRUE
+run AND TRUE FALSE
+run AND TRUE TRUE
+run OR FALSE TRUE
+run XOR TRUE TRUE
+
+# Because a boolean is a selector, IF is almost redundant:  p a b  already
+# means "if p then a else b".
+run IF TRUE ONE TWO
+run IF FALSE ONE TWO
