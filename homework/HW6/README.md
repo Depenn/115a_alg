@@ -309,13 +309,3 @@ HW6/
 ├── AI過程.md              ← AI-use log + chat share link
 └── README.md              ← this file
 ```
-
----
-
-## Note on AI assistance
-
-Parts of this homework were written with the help of an AI assistant. The full
-record — the prompts, the decisions, and what was kept or rewritten — is in
-[`AI過程.md`](AI過程.md), together with a link to the shared conversation.
-Independent verification is the test suite above: `python -m unittest discover
--s tests` exercises the interpreter end to end and can be run by anyone.
