@@ -1,0 +1,270 @@
+=== Rat in a maze (DFS) ===
+start=(1, 1) end=(9, 1)
+recursive DFS : 24 steps, 42 cells visited
+iterative DFS : 24 steps, 42 cells visited
+BFS (shortest): 16 steps
+
+DFS path ('*' = path, 'x' = dead end, backtracked):
+###########
+#S****#xxx#
+#.###*#x#x#
+#.#***#x#x#
+#.#*###x#x#
+#.#*****#x#
+#.#####*#x#
+#....***#x#
+#####*###x#
+#E****xxxx#
+###########
+
+BFS shortest path ('*'):
+###########
+#S....#...#
+#*###.#.#.#
+#*#...#.#.#
+#*#.###.#.#
+#*#.....#.#
+#*#####.#.#
+#*****..#.#
+#####*###.#
+#E****....#
+###########
+
+=== Wolf / goat / cabbage (BFS) ===
+safe states: 10 of 16, states expanded by BFS: 10
+minimum crossings: 7
+(F=farmer W=wolf G=goat C=cabbage; left bank |~~~~| right bank)
+  start          FWGC |~~~~|     
+  1. -> goat         WC |~~~~| FG  
+  2. <- (alone)     FWC |~~~~| G   
+  3. -> wolf          C |~~~~| FWG 
+  4. <- goat        FGC |~~~~| W   
+  5. -> cabbage       G |~~~~| FWC 
+  6. <- (alone)      FG |~~~~| WC  
+  7. -> goat            |~~~~| FWGC
+
+number of different shortest solutions: 2
+solution 1: goat, alone, wolf, goat, cabbage, alone, goat
+solution 2: goat, alone, cabbage, goat, wolf, alone, goat
+
+=== Eight queens (DFS + backtracking) ===
+all solutions          : 92  (15720 column tries, 2.1 ms)
+distinct up to symmetry: 12
+first solution found after 876 column tries: (0, 4, 7, 5, 2, 6, 1, 3)
+Q . . . . . . .
+. . . . Q . . .
+. . . . . . . Q
+. . . . . Q . .
+. . Q . . . . .
+. . . . . . Q .
+. Q . . . . . .
+. . . Q . . . .
+all valid: True
+brute force would test 8^8 = 16777216 placements
+
+n-queens counts with the same DFS:
+  n= 4:    2 solutions,      60 column tries
+  n= 5:   10 solutions,     220 column tries
+  n= 6:    4 solutions,     894 column tries
+  n= 7:   40 solutions,    3584 column tries
+  n= 8:   92 solutions,   15720 column tries
+  n= 9:  352 solutions,   72378 column tries
+  n=10:  724 solutions,  348150 column tries
+
+=== NPC searching for the player (A*) ===
+NPC at (1, 1), player at (9, 18), road cost 1, swamp '~' cost 5
+
+method                cost  steps  expanded
+A* (Manhattan)          35     35        59
+Dijkstra (h=0)          35     35        94
+Greedy best-first       55     31        32
+BFS (ignores cost)      55     31        97
+
+A* path ('*'):
+####################
+#N*****#...........#
+#.####*#.#######.#.#
+#.#****#.#.....#.#.#
+#.#*####.#.###.#.#.#
+#.#******#..~#.#...#
+#.######*###~#.###.#
+#......#*~~~~#.....#
+######.#*~~~~#####.#
+#......#*~~~~...**P#
+#.######*#######*###
+#.......*********..#
+####################
+
+BFS path (shortest in steps, goes through the swamp):
+####################
+#N*****#...........#
+#.####*#.#######.#.#
+#.#****#.#.....#.#.#
+#.#*####.#.###.#.#.#
+#.#******#..~#.#...#
+#.######*###~#.###.#
+#......#*****#.....#
+######.#.~~~*#####.#
+#......#.~~~******P#
+#.######.#######.###
+#..................#
+####################
+
+Greedy best-first path:
+####################
+#N*****#...........#
+#.####*#.#######.#.#
+#.#****#.#.....#.#.#
+#.#*####.#.###.#.#.#
+#.#******#..~#.#...#
+#.######*###~#.###.#
+#......#*****#.....#
+######.#.~~~*#####.#
+#......#.~~~******P#
+#.######.#######.###
+#..................#
+####################
+
+Chase simulation (player wanders randomly, NPC re-plans with A* each turn):
+  seed 0: caught after 30 turns, 877 nodes expanded in total
+  seed 1: caught after 32 turns, 1293 nodes expanded in total
+  seed 2: caught after 24 turns, 612 nodes expanded in total
+  seed 3: caught after 40 turns, 1105 nodes expanded in total
+  seed 4: caught after 29 turns, 780 nodes expanded in total
+
+=== IC wire routing ===
+--- Part A, chip 1 (open): one net from (9, 0) to (0, 19) ---
+method               length  bends  expanded  time(ms)
+Lee (BFS)                28      5       136     0.159
+Hadlock (0-1 BFS)        28      1        29     0.086
+Soukup (DFS+BFS)         28      1        29     0.048
+A* (Manhattan)           28      1       114     0.240
+A* + bend penalty        28      1        63     0.283
+(Manhattan lower bound = 28)
+
+Lee (BFS):
+...................X
+..####.....#####...x
+..####.....#####...x
+..####.............x
+.........####.xxxxxx
+.........####.x###..
+.###.....####.x###..
+.###.xxxxxxxxxx###..
+.###.x######........
+Xxxxxx######........
+
+--- Part A, chip 2 (blocked): one net from (6, 0) to (6, 19) ---
+method               length  bends  expanded  time(ms)
+Lee (BFS)                29      3       193     0.209
+Hadlock (0-1 BFS)        29      8       144     0.647
+Soukup (DFS+BFS)         31     12       153     0.233
+A* (Manhattan)           29      8       159     0.433
+A* + bend penalty        29      2       351     3.149
+(Manhattan lower bound = 19)
+
+Lee (BFS):
+....................
+...............#....
+...............#....
+...............#....
+..#####......#####..
+....##.......#####..
+Xxxx##.......#####.X
+...x##.......#####.x
+...x##.......#.....x
+...x##.......##....x
+...x##.......#.....x
+...xxxxxxxxxxxxxxxxx
+
+Hadlock (0-1 BFS):
+....................
+...............#....
+...............#....
+...............#....
+..#####......#####..
+....##.......#####..
+Xxxx##.......#####xX
+...x##.......#####x.
+...x##.......#.xxxx.
+...x##.......##x....
+...x##.......#xx....
+...xxxxxxxxxxxx.....
+
+Soukup (DFS+BFS):
+....................
+...............#....
+...............#....
+...............#....
+..#####......#####..
+....##.......#####..
+Xxxx##.......#####xX
+...x##.......#####x.
+...x##.......#.xxxx.
+...x##.......##x....
+...x##xxxxxxx#xx....
+...xxxx.....xxx.....
+
+A* (Manhattan):
+....................
+...............#....
+...............#....
+...............#....
+..#####......#####..
+....##.......#####..
+Xxxx##.......#####xX
+...x##.......#####x.
+...x##.......#.xxxx.
+...x##.......##x....
+...x##.......#xx....
+...xxxxxxxxxxxx.....
+
+A* + bend penalty:
+....................
+...............#....
+...............#....
+...............#....
+..#####......#####..
+....##.......#####..
+X...##.......#####.X
+x...##.......#####.x
+x...##.......#.....x
+x...##.......##....x
+x...##.......#.....x
+xxxxxxxxxxxxxxxxxxxx
+
+--- Part B: several nets on one layer ---
+
+given order A,B,C: routed 1/3 nets, total wire length 11
+............
+............
+....B...C...
+AaaaaaaaaaaA
+....B...C...
+............
+............
+
+shortest net first: routed 3/3 nets, total wire length 19
+............
+...aaaaaaaaa
+...aB...C..a
+Aaaab...c..A
+....B...C...
+............
+............
+
+rip-up & reroute (order A,B,C): routed 3/3 nets, total wire length 19
+............
+...aaaaaaaaa
+...aB...C..a
+Aaaab...c..A
+....B...C...
+............
+............
+
+Random benchmark: 200 chips, 12x12 grid, 6 nets, 4 random macros each
+strategy               nets routed  chips fully routed
+given order              846/1200             25/200
+shortest first           951/1200             39/200
+rip-up & reroute        1038/1200             78/200
+
