@@ -1,0 +1,109 @@
+
+==============================================================================
+Task 1 - single variable: derivative and integral
+==============================================================================
+f(x) = sin x,  f'(1) = cos 1 = 0.540302305868140
+       h |  forward error |  central error
+   1e-01 |      4.294e-02 |      9.001e-04
+   1e-02 |      4.216e-03 |      9.005e-06
+   1e-03 |      4.208e-04 |      9.005e-08
+   1e-04 |      4.207e-05 |      9.004e-10
+   1e-05 |      4.207e-06 |      1.114e-11
+   1e-06 |      4.207e-07 |      2.772e-11
+   1e-08 |      2.970e-09 |      2.581e-09
+   1e-10 |      5.848e-08 |      5.848e-08
+Forward error ~ h, central error ~ h^2, until rounding error (~eps/h) wins.
+
+f(x) = sin x on [0, pi], exact integral = 2
+     n |       left |      right |   midpoint |  trapezoid |    simpson
+    10 |   1.65e-02 |   1.65e-02 |   8.25e-03 |   1.65e-02 |   1.10e-04
+   100 |   1.64e-04 |   1.64e-04 |   8.22e-05 |   1.64e-04 |   1.08e-08
+  1000 |   1.64e-06 |   1.64e-06 |   8.22e-07 |   1.64e-06 |   1.08e-12
+(table shows |error|; x10 more intervals -> midpoint/trapezoid x100 smaller, Simpson x10^4 smaller)
+
+==============================================================================
+Task 2 - single variable: Monte Carlo integral
+==============================================================================
+f(x) = 4/(1+x^2) on [0, 1], exact integral = pi
+        N |   estimate | std error | true error
+      100 |   3.025961 |  6.76e-02 |   1.16e-01
+    1,000 |   3.104673 |  2.01e-02 |   3.69e-02
+   10,000 |   3.142359 |  6.43e-03 |   7.66e-04
+  100,000 |   3.142385 |  2.03e-03 |   7.92e-04
+1,000,000 |   3.141207 |  6.43e-04 |   3.86e-04
+x100 more samples -> about x10 smaller error (1/sqrt(N)).
+
+==============================================================================
+Task 3 - n variables: gradient and hypervolume (numerical, Riemann)
+==============================================================================
+f(x) = x1^2 x2 + sin x3 + exp(x1 x4)  at  x = (1, 2, 0.5, -1)
+numerical gradient: [3.6321205588 1.           0.8775825619 0.3678794412]
+exact gradient    : [3.6321205588 1.           0.8775825619 0.3678794412]
+max |error| = 2.11e-11
+
+f(x) = x1^2+...+x10^2 at x = (0.1, ..., 1.0): max |grad - 2x| = 1.81e-11
+
+Hypervolume of the unit n-ball = integral of its indicator over [-1, 1]^n
+ n | steps |      cells |   Riemann |     exact |    error
+ 2 |  1000 |  1,000,000 |   3.14182 |   3.14159 |  2.3e-04
+ 3 |   100 |  1,000,000 |   4.19187 |   4.18879 |  3.1e-03
+ 4 |    30 |    810,000 |   4.99315 |   4.93480 |  5.8e-02
+A 0/1 indicator is not smooth, so the error only falls like 1/steps.
+
+==============================================================================
+Task 4 - n variables: Monte Carlo hypervolume
+==============================================================================
+Unit n-ball volume, N = 1,000,000 random points in [-1, 1]^n
+ n | MC estimate | std error |     exact |    error
+ 2 |     3.14087 |   1.6e-03 |   3.14159 |  7.2e-04
+ 3 |     4.19180 |   4.0e-03 |   4.18879 |  3.0e-03
+ 4 |     4.92890 |   7.4e-03 |   4.93480 |  5.9e-03
+ 5 |     5.27110 |   1.2e-02 |   5.26379 |  7.3e-03
+10 |     2.52723 |   5.1e-02 |   2.55016 |  2.3e-02
+In 10-D the ball fills only 0.25% of the cube, so few points hit it and the
+relative error grows; still, the cost per point is the same in every dimension.
+
+==============================================================================
+Task 5 - Riemann integral(f, low, high), f = x1^2+...+xn^2, low=0, high=1
+==============================================================================
+exact value = n/3.  Midpoint rule with k steps gives exactly n(1/3 - 1/(12k^2)).
+  n | steps k |  cells k^n |     integral |     exact |    error |    time
+  1 | 2000000 |  2,000,000 |   0.33333333 |   0.33333 |  2.1e-14 |  0.084s
+  2 |    1414 |  1,999,396 |   0.66666658 |   0.66667 |  8.3e-08 |  0.178s
+  5 |      18 |  1,889,568 |   1.66538066 |   1.66667 |  1.3e-03 |  0.259s
+100 |       1 |          1 |  25.00000000 |  33.33333 |  8.3e+00 |  0.000s
+
+5-D: the cost explodes as k^5
+  k =  2:        32 cells, integral = 1.562500, error = 1.0e-01, 0.000s
+  k =  4:     1,024 cells, integral = 1.640625, error = 2.6e-02, 0.000s
+  k =  8:    32,768 cells, integral = 1.660156, error = 6.5e-03, 0.004s
+  k = 16: 1,048,576 cells, integral = 1.665039, error = 1.6e-03, 0.137s
+  k = 18: 1,889,568 cells, integral = 1.665381, error = 1.3e-03, 0.244s
+
+100-D: with 2,000,000 cells allowed, only k = 1 fits (one cell, the centre).
+       k = 1 gives 100 * 0.5^2 = 25, far from 33.333.
+  steps=2: ValueError: 2^100 = 1.268e+30 cells is more than max_points=2,000,000; the Riemann sum is not feasible (curse of dimensionality)
+  steps=10: ValueError: 10^100 = 1.000e+100 cells is more than max_points=2,000,000; the Riemann sum is not feasible (curse of dimensionality)
+  (2^100 cells at 10^9 cells/s would take about 4 * 10^13 years.)
+
+Because this f is a sum of one-variable terms, integral_separable gets the
+same Riemann sum that the full k^100 grid would give, with only 100*k work:
+  k =    1: (virtual 1^100 cells) integral = 25.00000000, error = 8.3e+00
+  k =   10: (virtual 10^100 cells) integral = 33.25000000, error = 8.3e-02
+  k =  100: (virtual 100^100 cells) integral = 33.33250000, error = 8.3e-04
+  k = 1000: (virtual 1000^100 cells) integral = 33.33332500, error = 8.3e-06
+
+==============================================================================
+Task 6 - Monte Carlo mc_integral(f, low, high), same problem
+==============================================================================
+  n |         N |  MC estimate | std error |     exact |    error |    time
+  1 |    10,000 |     0.330193 |   3.0e-03 |   0.33333 |  3.1e-03 |  0.000s
+  1 | 1,000,000 |     0.333337 |   3.0e-04 |   0.33333 |  3.6e-06 |  0.023s
+  2 |    10,000 |     0.666617 |   4.2e-03 |   0.66667 |  5.0e-05 |  0.001s
+  2 | 1,000,000 |     0.666433 |   4.2e-04 |   0.66667 |  2.3e-04 |  0.039s
+  5 |    10,000 |     1.670959 |   6.7e-03 |   1.66667 |  4.3e-03 |  0.001s
+  5 | 1,000,000 |     1.666356 |   6.7e-04 |   1.66667 |  3.1e-04 |  0.078s
+100 |    10,000 |    33.333688 |   3.0e-02 |  33.33333 |  3.6e-04 |  0.012s
+100 | 1,000,000 |    33.333030 |   3.0e-03 |  33.33333 |  3.0e-04 |  1.481s
+Std error = sqrt(n * 4/45 / N): it grows only like sqrt(n), and 100-D costs
+the same number of points as 1-D.  Riemann needs k^n cells; Monte Carlo needs N.
