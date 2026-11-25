@@ -1,0 +1,319 @@
+################ python fsm.py
+======================================================================
+1. DFA examples
+======================================================================
+a*  (1 states)
+  ''           -> True   path q0
+  'aaa'        -> True   path q0 q0 q0 q0
+  'aab'        -> False  path q0 q0 q0 None
+
+a* b+  (2 states)
+  'a'          -> False  path A A
+  'aab'        -> True   path A A A B
+  'aabaa'      -> False  path A A A B None
+  'abbb'       -> True   path A A B B B
+
+even number of 0s  (2 states)
+  '010'        -> True   path E O O E
+  '101'        -> False  path E E O O
+  '10100'      -> False  path E E O O E O
+  '1010010'    -> True   path E E O O E O O E
+
+binary divisible by 3  (3 states)
+  '0'          -> True   path 0 0
+  '11'         -> True   path 0 1 0
+  '110'        -> True   path 0 1 0 0
+  '1001'       -> True   path 0 1 2 1 0
+  '1010'       -> False  path 0 1 2 2 1
+
+  check: every n < 1000 -> True
+
+======================================================================
+2. NFA with epsilon moves, subset construction
+======================================================================
+contains 'aba' (NFA)  (5 states)
+  'ab'         -> False
+  'aaba'       -> True
+  'bbabab'     -> True
+  'abba'       -> False
+
+  subset construction -> DFA with 6 states, minimized -> 4 states
+
+  k-th symbol from the end is 1:
+   k | NFA states | DFA states (subset) | minimal DFA
+   1 |          2 |                   2 |           2
+   2 |          3 |                   4 |           4
+   3 |          4 |                   8 |           8
+   4 |          5 |                  16 |          16
+   5 |          6 |                  32 |          32
+   6 |          7 |                  64 |          64
+   7 |          8 |                 128 |         128
+   8 |          9 |                 256 |         256
+   9 |         10 |                 512 |         512
+  10 |         11 |                1024 |        1024
+  -> the DFA needs 2^k states: the NFA is exponentially smaller.
+
+======================================================================
+3. DFA minimization (Moore partition refinement)
+======================================================================
+  'even number of a' built with 4 states -> minimal DFA has 2 states
+  minimal transitions: [((0, 'a'), 1), ((0, 'b'), 0), ((1, 'a'), 0), ((1, 'b'), 1)], finals {0}
+  divisible by 2: 2 states -> minimal 2
+  divisible by 3: 3 states -> minimal 3
+  divisible by 5: 5 states -> minimal 5
+  divisible by 6: 6 states -> minimal 4
+  divisible by 8: 8 states -> minimal 4
+
+======================================================================
+4. a^n b^n is not regular: a pigeonhole counterexample for every DFA
+======================================================================
+  DFA correct up to n=1 (4 states): a^2 and a^3 reach the same state -> wrong on 'aabb' (says False, truth True)
+  DFA correct up to n=3 (8 states): a^4 and a^5 reach the same state -> wrong on 'aaaabbbb' (says False, truth True)
+  DFA correct up to n=5 (12 states): a^6 and a^7 reach the same state -> wrong on 'aaaaaabbbbbb' (says False, truth True)
+  DFA correct up to n=8 (18 states): a^9 and a^10 reach the same state -> wrong on 'aaaaaaaaabbbbbbbbb' (says False, truth True)
+  More states only move the error further out; it never disappears.
+
+################ python pda.py
+======================================================================
+Pushdown automata (BFS over nondeterministic configurations)
+======================================================================
+a^n b^n
+  ''         -> True   (2 configurations)
+  'ab'       -> True   (5 configurations)
+  'aabb'     -> True   (7 configurations)
+  'aab'      -> False  (5 configurations)
+  'abab'     -> False  (5 configurations)
+  'aaabbb'   -> True   (9 configurations)
+  agrees with the Python predicate on all 2047 words of length <= 10: True
+
+balanced ( )
+  '()'       -> True   (5 configurations)
+  '(()())'   -> True   (9 configurations)
+  '())('     -> False  (5 configurations)
+  '((('      -> False  (5 configurations)
+  agrees with the Python predicate on all 2047 words of length <= 10: True
+
+w w^R (even palindrome)
+  'abba'     -> True   (14 configurations)
+  'abab'     -> False  (11 configurations)
+  'baaaab'   -> True   (21 configurations)
+  'aa'       -> True   (9 configurations)
+  'aba'      -> False  (9 configurations)
+  agrees with the Python predicate on all 2047 words of length <= 10: True
+
+#a > #b
+  'a'        -> True   (3 configurations)
+  'ab'       -> False  (4 configurations)
+  'bbaaa'    -> True   (7 configurations)
+  'babab'    -> False  (6 configurations)
+  'bbaa'     -> False  (5 configurations)
+  agrees with the Python predicate on all 2047 words of length <= 10: True
+
+An accepting computation of the palindrome PDA on 'abba' (state, read, stack):
+  push  read ''      stack $
+  push  read 'a'     stack a$
+  push  read 'ab'    stack ba$
+  pop   read 'ab'    stack ba$
+  pop   read 'abb'   stack a$
+  pop   read 'abba'  stack $
+  acc   read 'abba'  stack $
+  The move push -> pop happens after 'ab': the guessed middle.
+
+################ python grammar.py
+======================================================================
+1. Chomsky type of each grammar and its language (all words up to a length)
+======================================================================
+a* b+  -> type 3
+  S -> a S
+  S -> b B
+  S -> b
+  B -> b B
+  B -> b
+  words of length <= 6 (21): b, ab, bb, aab, abb, bbb, aaab, aabb, abbb, bbbb, aaaab, aaabb, aabbb, abbbb, bbbbb, aaaaab, aaaabb, aaabbb, aabbbb, abbbbb, bbbbbb
+
+a^n b^n  -> type 2
+  S -> a S b
+  S -> a b
+  words of length <= 8 (4): ab, aabb, aaabbb, aaaabbbb
+
+balanced ( )  -> type 2
+  S -> ( S ) S
+  S -> ε
+  words of length <= 6 (9): ε, (), (()), ()(), ((())), (()()), (())(), ()(()), ()()()
+
+a^n b^n c^n  -> type 1
+  S -> a b c
+  S -> a S B c
+  c B -> B c
+  b B -> b b
+  words of length <= 9 (3): abc, aabbcc, aaabbbccc
+
+w w (copy language)  -> type 0
+  S -> T E
+  T -> a A T
+  T -> b B T
+  T -> ε
+  A a -> a A
+  A b -> b A
+  B a -> a B
+  B b -> b B
+  A E -> E a
+  B E -> E b
+  E -> ε
+  words of length <= 6 (15): ε, aa, bb, aaaa, abab, baba, bbbb, aaaaaa, aabaab, abaaba, abbabb, baabaa, babbab, bbabba, bbbbbb
+
+======================================================================
+2. Derivations
+======================================================================
+a^n b^n c^n: shortest derivation of 'aabbcc' (4 steps)
+   S
+=> a S B c
+=> a a b c B c
+=> a a b B c c
+=> a a b b c c
+
+w w: shortest derivation of 'abab' (8 steps)
+   S
+=> T E
+=> a A T E
+=> a A b B T E
+=> a A b B E
+=> a b A B E
+=> a b A E b
+=> a b E a b
+=> a b a b
+
+======================================================================
+3. Random generation
+======================================================================
+arithmetic expressions (type 2):
+   y
+   x + y + x
+   2 * y + 2
+   y * y * 2
+   y
+toy English (type 2):
+   the dog sees the dog
+   the cat chases the hungry cat
+   the small cat chases a student
+   a cat sees
+   a dog chases
+one random derivation of a^n b^n c^n:
+    S
+    a S B c
+    a a S B c B c
+    a a a b c B c B c
+    a a a b c B B c c
+    a a a b B c B c c
+    a a a b b c B c c
+    a a a b b B c c c
+    a a a b b b c c c
+
+======================================================================
+4. CYK parsing (Chomsky normal form, dynamic programming O(n^3))
+======================================================================
+  'aabb'     -> True
+  'aaabbb'   -> True
+  'aabbb'    -> False
+  'abab'     -> False
+  '(())()'   -> True
+  '(()'      -> False
+  '()()()'   -> True
+  ')('       -> False
+
+  CYK table for 'aabb' (row = substring length, column = start index):
+   len 1: A      A      B      B    
+   len 2: -      S      -    
+   len 3: -      X    
+   len 4: S    
+
+################ python turing.py
+======================================================================
+1. Decider for a^n b^n c^n (not context-free)
+======================================================================
+  ''           -> accept    1 steps   final tape 
+  'abc'        -> accept    8 steps   final tape XYZ
+  'aabbcc'     -> accept   23 steps   final tape XXYYZZ
+  'aabbc'      -> reject   13 steps   final tape XXYYZ
+  'abcabc'     -> reject    7 steps   final tape XYZabc
+  'acb'        -> reject    1 steps   final tape Xcb
+  'aaabbbccc'  -> accept   46 steps   final tape XXXYYYZZZ
+
+  step-by-step on 'abc' (state, tape with [head]):
+    q0   [a]bc
+    q1   X[b]c
+    q2   XY[c]
+    q3   X[Y]Z
+    q3   [X]YZ
+    q0   X[Y]Z
+    q4   XY[Z]
+    q4   XYZ[_]
+    acc  XYZ[_]
+
+  steps grow like n^2 (the head sweeps back and forth once per round):
+     n | steps | steps / n^2
+     1 |     8 | 8.00
+     2 |    23 | 5.75
+     4 |    77 | 4.81
+     8 |   281 | 4.39
+    16 |  1073 | 4.19
+    32 |  4193 | 4.09
+    64 | 16577 | 4.05
+
+======================================================================
+2. Palindromes over {a, b}
+======================================================================
+  ''       -> accept   1 steps
+  'a'      -> accept   3 steps
+  'abba'   -> accept  15 steps
+  'abab'   -> reject   5 steps
+  'aabaa'  -> accept  21 steps
+  'abbab'  -> reject   6 steps
+
+======================================================================
+3. Machines that compute functions
+======================================================================
+  increment        0 ->         1   (0 + 1 = 1)
+  increment        1 ->        10   (1 + 1 = 2)
+  increment      101 ->       110   (5 + 1 = 6)
+  increment      111 ->      1000   (7 + 1 = 8)
+  increment     1011 ->      1100   (11 + 1 = 12)
+  increment 11111111 -> 100000000   (255 + 1 = 256)
+  unary add    11+111 -> 11111    (2 + 3 = 5)
+  unary add     +1111 -> 1111     (0 + 4 = 4)
+  unary add    11111+ -> 11111    (5 + 0 = 5)
+
+======================================================================
+4. Busy beavers (start on an all-0 tape)
+======================================================================
+  states | steps until halt | 1s left on the tape
+       2 |                6 |     4   tape 1111
+       3 |               14 |     6   tape 111111
+       4 |              107 |    13   tape 10111111111111
+
+======================================================================
+5. Halting: a step budget is not a halting decider
+======================================================================
+  walk-right-forever after 1000 steps: timeout (it never halts, but a simulator cannot tell 'never' from 'not yet')
+  budget   10: input 1^11 -> tester says halts=False, truth: halts after 11 steps
+  budget  100: input 1^101 -> tester says halts=False, truth: halts after 101 steps
+  budget 1000: input 1^1001 -> tester says halts=False, truth: halts after 1001 steps
+
+################ python test_computation.py
+  ok  test_anbn_counterexample_for_random_dfas
+  ok  test_anbncn_steps_quadratic
+  ok  test_busy_beavers_and_timeout
+  ok  test_chomsky_types
+  ok  test_cyk
+  ok  test_derivations
+  ok  test_dfa_examples
+  ok  test_grammar_languages
+  ok  test_minimize
+  ok  test_nfa_and_subset_construction
+  ok  test_pda_trace
+  ok  test_pdas
+  ok  test_random_generation
+  ok  test_same_language_in_every_model
+  ok  test_tm_deciders
+  ok  test_tm_functions
+all 16 tests passed
